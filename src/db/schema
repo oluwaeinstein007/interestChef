@@ -1,0 +1,29 @@
+-- Users table
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(50) UNIQUE,
+  interest_vector FLOAT[],
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Posts table
+CREATE TABLE posts (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  content TEXT,
+  embedding VECTOR(1536), -- For pgvector extension
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Interactions table
+CREATE TABLE interactions (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  post_id INTEGER REFERENCES posts(id),
+  type VARCHAR(20), -- view, like, comment, share
+  duration INTEGER, -- dwell time in seconds
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_interactions_user ON interactions(user_id);
+CREATE INDEX idx_interactions_post ON interactions(post_id);
